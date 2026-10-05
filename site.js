@@ -223,7 +223,10 @@
 
     // Boutique
     const shop = D.shop;
-    if (isUrl(shop.commande)) $("#order").href = shop.commande;
+    // Bon de commande Tally : page du site ; autre lien : nouvel onglet.
+    if (isUrl(shop.commande) && !tallyId(shop.commande)) {
+      Object.assign($("#order"), { href: shop.commande, target: "_blank", rel: "noopener" });
+    }
     $("#shop-note").textContent = shop.note || "";
     $("#shop").innerHTML = (shop.articles || []).map((a) => `<div class="item">
         <div class="ph">${a.image ? `<img src="${esc(asset(a.image))}" alt="${esc(a.nom)}" loading="lazy">` : ""}</div>
@@ -432,6 +435,24 @@
     };
   }
 
+  function pageCommande() {
+    const shop = D.shop || {};
+    const formId = tallyId(shop.commande) || "obWkOx";
+    const articles = shop.articles || [];
+    return {
+      title: "Commander",
+      html: `${back("#boutique", "Boutique")}
+        <div class="page-head"><p class="kicker">Boutique</p><h1>Bon de commande</h1>
+        ${shop.note ? `<p class="muted">${esc(shop.note)}</p>` : ""}</div>
+        ${articles.length ? `<div class="order-items">${articles.map((a) => `<div class="order-item">
+            ${a.image ? `<img src="${esc(asset(a.image))}" alt="" loading="lazy">` : ""}
+            <span>${esc(a.nom)}</span><strong>${typeof a.prix === "number" ? a.prix.toLocaleString("fr-BE") + " €" : esc(a.prix)}</strong>
+          </div>`).join("")}</div>` : ""}
+        ${tallyEmbed(formId, "Bon de commande Borin'Old Cars")}`,
+      bind: loadTally,
+    };
+  }
+
   function pageInscription(id) {
     const ev = D.events.find((e) => e.id === id);
     const formId = ev && tallyId(ev.inscription);
@@ -455,7 +476,7 @@
     [/^sorties$/, pageEvents], [/^sortie-(.+)$/, pageEvent],
     [/^voitures$/, pageCars], [/^voiture-(.+)$/, pageCar],
     [/^albums$/, pageAlbums], [/^album-(.+)$/, pageAlbum],
-    [/^adhesion$/, pageAdhesion], [/^inscription-(.+)$/, pageInscription],
+    [/^adhesion$/, pageAdhesion], [/^inscription-(.+)$/, pageInscription], [/^commande$/, pageCommande],
   ];
   const main = $("main"), page = $("#page");
   const baseTitle = document.title;

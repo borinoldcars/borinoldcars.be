@@ -9,7 +9,8 @@ Site vitrine public du club **Borin'Old Cars** : https://borinoldcars.be
 - Les textes de présentation (« Le club », « Nous rejoindre ») se modifient dans `index.html`.
 - Pages internes par ancre : `#sorties`, `#sortie-<id>`, `#voitures`, `#voiture-<id>`, `#albums`, `#album-<id>`,
   `#adhesion` (formulaire d'adhésion Tally intégré, identifiant `ADHESION_FORM` dans `site.js`),
-  `#inscription-<id>` (inscription à une sortie).
+  `#inscription-<id>` (inscription à une sortie), `#commande` (bon de commande de la boutique, lien
+  `commande` de `boutique.json`).
 - Inscriptions : quand le lien `Inscription` d'une sortie (Google Sheet → `events.json`) est un formulaire
   Tally (`https://tally.so/r/...`), le bouton « S'inscrire » ouvre une page du site avec ce formulaire
   intégré. Tout autre lien s'ouvre tel quel dans un nouvel onglet.
