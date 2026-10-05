@@ -391,11 +391,40 @@
     };
   }
 
+  // Demande d'adhésion : le formulaire Tally du club, intégré dans la page.
+  // Les réponses arrivent dans Tally comme avant ; les questions se modifient dans Tally.
+  const ADHESION_FORM = "OD46PM";
+  function pageAdhesion() {
+    const embed = `https://tally.so/embed/${ADHESION_FORM}?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1`;
+    const email = D.cfg.email || "borinoldcars@gmail.com";
+    return {
+      title: "Adhésion",
+      html: `${back("#contact", "Accueil")}
+        <div class="page-head"><p class="kicker">Nous rejoindre</p><h1>Demande d'adhésion</h1>
+        <p class="muted">Remplissez le formulaire ci-dessous pour demander à rejoindre le club.
+        Une question avant de vous lancer ? Écrivez-nous à <a href="mailto:${esc(email)}">${esc(email)}</a>.</p></div>
+        <div class="tally-box">
+          <iframe data-tally-src="${embed}" src="${embed}" loading="lazy" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0" title="Demande d'adhésion à Borin'Old Cars"></iframe>
+        </div>
+        <p class="small muted">Le formulaire ne s'affiche pas ? <a href="https://tally.so/r/${ADHESION_FORM}" target="_blank" rel="noopener">Ouvrez-le dans un nouvel onglet</a>.</p>`,
+      bind() {
+        // Script officiel de Tally : ajuste la hauteur du formulaire à son contenu.
+        if (window.Tally) { window.Tally.loadEmbeds(); return; }
+        if (document.querySelector('script[src="https://tally.so/widgets/embed.js"]')) return;
+        const s = document.createElement("script");
+        s.src = "https://tally.so/widgets/embed.js";
+        s.onload = () => window.Tally && window.Tally.loadEmbeds();
+        document.body.appendChild(s);
+      },
+    };
+  }
+
   // ---------- Navigation ----------
   const ROUTES = [
     [/^sorties$/, pageEvents], [/^sortie-(.+)$/, pageEvent],
     [/^voitures$/, pageCars], [/^voiture-(.+)$/, pageCar],
     [/^albums$/, pageAlbums], [/^album-(.+)$/, pageAlbum],
+    [/^adhesion$/, pageAdhesion],
   ];
   const main = $("main"), page = $("#page");
   const baseTitle = document.title;

@@ -7,5 +7,6 @@ Site vitrine public du club **Borin'Old Cars** : https://borinoldcars.be
   (dépôt `borinoldcars/borinoldcars.github.io`). Il n'y a donc rien à mettre à jour ici pour une nouvelle
   sortie, voiture ou photo.
 - Les textes de présentation (« Le club », « Nous rejoindre ») se modifient dans `index.html`.
-- Pages internes par ancre : `#sorties`, `#sortie-<id>`, `#voitures`, `#voiture-<id>`, `#albums`, `#album-<id>`.
+- Pages internes par ancre : `#sorties`, `#sortie-<id>`, `#voitures`, `#voiture-<id>`, `#albums`, `#album-<id>`,
+  `#adhesion` (formulaire d'adhésion Tally intégré, identifiant `ADHESION_FORM` dans `site.js`).
 - Le domaine est déclaré dans le fichier `CNAME` ; il est servi par GitHub Pages (branche `main`, dossier racine).
