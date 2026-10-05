@@ -10,3 +10,5 @@ Site vitrine public du club **Borin'Old Cars** : https://borinoldcars.be
 - Pages internes par ancre : `#sorties`, `#sortie-<id>`, `#voitures`, `#voiture-<id>`, `#albums`, `#album-<id>`,
   `#adhesion` (formulaire d'adhésion Tally intégré, identifiant `ADHESION_FORM` dans `site.js`).
 - Le domaine est déclaré dans le fichier `CNAME` ; il est servi par GitHub Pages (branche `main`, dossier racine).
+- Après une modification de `site.css` ou `site.js`, augmenter le numéro `?v=` dans `index.html` pour que les
+  navigateurs rechargent les fichiers.
