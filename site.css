@@ -330,7 +330,12 @@ body.noscroll { overflow: hidden; }
 .address { font-style: normal; font-weight: 700; margin-bottom: 1.2em; }
 
 /* Formulaire d'adhésion (Tally intégré) */
-/* Fond brun du formulaire dans Tally (#78502f) : son texte clair y est lisible, quel que soit le rendu de l'intégration. */
-.tally-box { max-width: 760px; background: #78502f; border-radius: var(--radius); padding: 20px 16px 8px; box-shadow: var(--shadow); margin-bottom: 16px; }
+/* Le formulaire Tally reprend les couleurs du site (texte brun foncé, fond transparent) :
+   il se pose directement sur le fond beige. En thème sombre, il garde un fond clair pour rester lisible. */
+.tally-box { max-width: 760px; margin-bottom: 16px; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .tally-box { background: #e5decf; border-radius: var(--radius); padding: 16px 12px 4px; }
+}
+:root[data-theme="dark"] .tally-box { background: #e5decf; border-radius: var(--radius); padding: 16px 12px 4px; }
 .tally-box iframe { display: block; width: 100%; border: 0; min-height: 400px; }
 .page-head a { color: var(--brass); }
