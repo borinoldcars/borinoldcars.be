@@ -330,6 +330,6 @@ body.noscroll { overflow: hidden; }
 .address { font-style: normal; font-weight: 700; margin-bottom: 1.2em; }
 
 /* Formulaire d'adhésion (Tally intégré) */
-.tally-box { max-width: 760px; background: var(--surface); border-radius: var(--radius); padding: 20px 16px; box-shadow: var(--shadow); margin-bottom: 16px; }
+.tally-box { max-width: 760px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); margin-bottom: 16px; }
 .tally-box iframe { display: block; width: 100%; border: 0; min-height: 400px; }
 .page-head a { color: var(--brass); }

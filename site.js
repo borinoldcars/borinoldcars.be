@@ -395,7 +395,7 @@
   // Les réponses arrivent dans Tally comme avant ; les questions se modifient dans Tally.
   const ADHESION_FORM = "OD46PM";
   function pageAdhesion() {
-    const embed = `https://tally.so/embed/${ADHESION_FORM}?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1`;
+    const embed = `https://tally.so/embed/${ADHESION_FORM}?alignLeft=1&hideTitle=1&dynamicHeight=1`;
     const email = D.cfg.email || "borinoldcars@gmail.com";
     return {
       title: "Adhésion",
