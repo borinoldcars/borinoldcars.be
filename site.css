@@ -342,3 +342,6 @@ body.noscroll { overflow: hidden; }
 .order-item img { width: 100%; aspect-ratio: 1; object-fit: contain; background: #fff; border-radius: 6px; margin-bottom: 6px; }
 .order-item span { display: block; line-height: 1.25; }
 .order-item strong { color: var(--brass); }
+
+/* Dessin de voiture d'un seul trait, au-dessus du sous-titre de l'accueil */
+.hero-sketch { width: min(100%, 420px); height: auto; margin: 0 0 18px; opacity: .95; }
