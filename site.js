@@ -95,7 +95,7 @@
           ${ev.image ? `<a class="thumb" href="${link("sortie", ev.id)}" tabindex="-1"><img src="${esc(ev.image)}" alt="Affiche : ${esc(ev.titre)}" loading="lazy" onerror="this.parentNode.remove()"></a>` : ""}
         </div>
         <div class="actions">
-          ${form ? `<a class="btn" href="${esc(form)}" target="_blank" rel="noopener">S'inscrire</a>` : ""}
+          ${form ? signupButton(ev, form) : ""}
           ${album ? `<a class="btn outline" href="${link("album", album.id)}">Voir les photos</a>` : ""}
           <a class="btn outline" href="${link("sortie", ev.id)}">Détails</a>
         </div>
@@ -277,7 +277,7 @@
             </dl>
             ${ev.description ? `<p class="story">${esc(ev.description).replace(/\n/g, "<br>")}</p>` : ""}
             <div class="actions">
-              ${form ? `<a class="btn" href="${esc(form)}" target="_blank" rel="noopener">S'inscrire</a>` : ""}
+              ${form ? signupButton(ev, form) : ""}
               ${album ? `<a class="btn outline" href="${link("album", album.id)}">Voir les photos (${pics(album).length || "album"})</a>` : ""}
             </div>
           </div>
@@ -391,11 +391,35 @@
     };
   }
 
-  // Demande d'adhésion : le formulaire Tally du club, intégré dans la page.
+  // ---------- Formulaires Tally intégrés ----------
+  // Un lien tally.so (adhésion, inscription à une sortie) s'affiche dans une page du site.
   // Les réponses arrivent dans Tally comme avant ; les questions se modifient dans Tally.
+  const tallyId = (url) => { const m = /^https?:\/\/tally\.so\/(?:r|embed)\/([A-Za-z0-9]+)/i.exec(url || ""); return m ? m[1] : ""; };
+  function tallyEmbed(formId, title) {
+    const src = `https://tally.so/embed/${formId}?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1`;
+    return `<div class="tally-box">
+          <iframe data-tally-src="${src}" src="${src}" loading="lazy" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0" title="${esc(title)}"></iframe>
+        </div>
+        <p class="small muted">Le formulaire ne s'affiche pas ? <a href="https://tally.so/r/${formId}" target="_blank" rel="noopener">Ouvrez-le dans un nouvel onglet</a>.</p>`;
+  }
+  function loadTally() {
+    // Script officiel de Tally : ajuste la hauteur du formulaire à son contenu.
+    if (window.Tally) { window.Tally.loadEmbeds(); return; }
+    if (document.querySelector('script[src="https://tally.so/widgets/embed.js"]')) return;
+    const s = document.createElement("script");
+    s.src = "https://tally.so/widgets/embed.js";
+    s.onload = () => window.Tally && window.Tally.loadEmbeds();
+    document.body.appendChild(s);
+  }
+  // Bouton « S'inscrire » : page d'inscription du site pour un formulaire Tally, sinon le lien tel quel.
+  function signupButton(ev, form) {
+    return tallyId(form)
+      ? `<a class="btn" href="${link("inscription", ev.id)}">S'inscrire</a>`
+      : `<a class="btn" href="${esc(form)}" target="_blank" rel="noopener">S'inscrire</a>`;
+  }
+
   const ADHESION_FORM = "OD46PM";
   function pageAdhesion() {
-    const embed = `https://tally.so/embed/${ADHESION_FORM}?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1`;
     const email = D.cfg.email || "borinoldcars@gmail.com";
     return {
       title: "Adhésion",
@@ -403,19 +427,26 @@
         <div class="page-head"><p class="kicker">Nous rejoindre</p><h1>Demande d'adhésion</h1>
         <p class="muted">Remplissez le formulaire ci-dessous pour demander à rejoindre le club.
         Une question avant de vous lancer ? Écrivez-nous à <a href="mailto:${esc(email)}">${esc(email)}</a>.</p></div>
-        <div class="tally-box">
-          <iframe data-tally-src="${embed}" src="${embed}" loading="lazy" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0" title="Demande d'adhésion à Borin'Old Cars"></iframe>
-        </div>
-        <p class="small muted">Le formulaire ne s'affiche pas ? <a href="https://tally.so/r/${ADHESION_FORM}" target="_blank" rel="noopener">Ouvrez-le dans un nouvel onglet</a>.</p>`,
-      bind() {
-        // Script officiel de Tally : ajuste la hauteur du formulaire à son contenu.
-        if (window.Tally) { window.Tally.loadEmbeds(); return; }
-        if (document.querySelector('script[src="https://tally.so/widgets/embed.js"]')) return;
-        const s = document.createElement("script");
-        s.src = "https://tally.so/widgets/embed.js";
-        s.onload = () => window.Tally && window.Tally.loadEmbeds();
-        document.body.appendChild(s);
-      },
+        ${tallyEmbed(ADHESION_FORM, "Demande d'adhésion à Borin'Old Cars")}`,
+      bind: loadTally,
+    };
+  }
+
+  function pageInscription(id) {
+    const ev = D.events.find((e) => e.id === id);
+    const formId = ev && tallyId(ev.inscription);
+    if (!ev || !formId) return { title: "Inscription", html: notFound("#sorties", "Agenda", "Inscription") };
+    if (isPast(ev)) {
+      return { title: ev.titre, html: `${back(link("sortie", ev.id), ev.titre)}<p class="empty">Les inscriptions à cette sortie sont closes : elle a eu lieu le ${esc(longDate(ev.date))}.</p>` };
+    }
+    const hours = ev.heure ? (ev.fin ? `de ${ev.heure} à ${ev.fin}` : `à partir de ${ev.heure}`) : "";
+    return {
+      title: `Inscription · ${ev.titre}`,
+      html: `${back(link("sortie", ev.id), ev.titre)}
+        <div class="page-head"><p class="kicker">Inscription</p><h1>${esc(ev.titre)}</h1>
+        <p class="muted">${[cap(longDate(ev.date)), hours, ev.lieu, ev.prix].filter(Boolean).map(esc).join(" · ")}</p></div>
+        ${tallyEmbed(formId, `Inscription : ${ev.titre}`)}`,
+      bind: loadTally,
     };
   }
 
@@ -424,7 +455,7 @@
     [/^sorties$/, pageEvents], [/^sortie-(.+)$/, pageEvent],
     [/^voitures$/, pageCars], [/^voiture-(.+)$/, pageCar],
     [/^albums$/, pageAlbums], [/^album-(.+)$/, pageAlbum],
-    [/^adhesion$/, pageAdhesion],
+    [/^adhesion$/, pageAdhesion], [/^inscription-(.+)$/, pageInscription],
   ];
   const main = $("main"), page = $("#page");
   const baseTitle = document.title;

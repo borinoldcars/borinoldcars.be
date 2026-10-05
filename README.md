@@ -8,7 +8,14 @@ Site vitrine public du club **Borin'Old Cars** : https://borinoldcars.be
   sortie, voiture ou photo.
 - Les textes de présentation (« Le club », « Nous rejoindre ») se modifient dans `index.html`.
 - Pages internes par ancre : `#sorties`, `#sortie-<id>`, `#voitures`, `#voiture-<id>`, `#albums`, `#album-<id>`,
-  `#adhesion` (formulaire d'adhésion Tally intégré, identifiant `ADHESION_FORM` dans `site.js`).
+  `#adhesion` (formulaire d'adhésion Tally intégré, identifiant `ADHESION_FORM` dans `site.js`),
+  `#inscription-<id>` (inscription à une sortie).
+- Inscriptions : quand le lien `Inscription` d'une sortie (Google Sheet → `events.json`) est un formulaire
+  Tally (`https://tally.so/r/...`), le bouton « S'inscrire » ouvre une page du site avec ce formulaire
+  intégré. Tout autre lien s'ouvre tel quel dans un nouvel onglet.
+- Les formulaires intégrés ont un fond transparent : dans Tally, leur donner les couleurs du site
+  (Design → fond #e5decf, texte #222222, accent #8a6538, bouton #2f2118 / texte #f1e4cc,
+  police Playfair Display), sinon le texte risque d'être illisible.
 - Le domaine est déclaré dans le fichier `CNAME` ; il est servi par GitHub Pages (branche `main`, dossier racine).
 - Après une modification de `site.css` ou `site.js`, augmenter le numéro `?v=` dans `index.html` pour que les
   navigateurs rechargent les fichiers.
