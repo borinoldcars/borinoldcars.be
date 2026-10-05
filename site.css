@@ -344,4 +344,4 @@ body.noscroll { overflow: hidden; }
 .order-item strong { color: var(--brass); }
 
 /* Dessin de voiture d'un seul trait, au-dessus du sous-titre de l'accueil */
-.hero-sketch { width: min(100%, 420px); height: auto; margin: 0 0 18px; opacity: .95; }
+.hero-sketch { width: min(65%, 260px); height: auto; margin: 0 0 18px; opacity: .95; }
