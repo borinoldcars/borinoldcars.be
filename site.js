@@ -208,18 +208,8 @@
     $("#cars").innerHTML = (comite.length ? comite : D.cars.filter((v) => v.photo).slice(0, 8)).map(carCard).join("")
       + `<div class="more"><a class="btn outline" href="#voitures">Voir les voitures des membres</a></div>`;
 
-    // Albums + quelques photos de la dernière sortie.
+    // Albums des dernières sorties.
     $("#albums").innerHTML = D.albums.slice(0, 3).map(albumCard).join("");
-    const last = D.albums.find((a) => pics(a).length);
-    if (last) {
-      const strip = document.createElement("div");
-      strip.className = "strip";
-      const list12 = pics(last).slice(0, 12);
-      strip.innerHTML = list12.map((p, i) =>
-        `<button data-i="${i}" aria-label="Agrandir la photo ${i + 1}"><img src="${esc(p.thumb)}" alt="" loading="lazy" onerror="this.parentNode.remove()"></button>`).join("");
-      strip.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) openPhotos(list12.map((p) => p.full), +b.dataset.i); });
-      $("#albums").after(strip);
-    }
 
     // Boutique
     const shop = D.shop;
