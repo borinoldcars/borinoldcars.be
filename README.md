@@ -20,3 +20,6 @@ Site vitrine public du club **Borin'Old Cars** : https://borinoldcars.be
 - Le domaine est déclaré dans le fichier `CNAME` ; il est servi par GitHub Pages (branche `main`, dossier racine).
 - Après une modification de `site.css` ou `site.js`, augmenter le numéro `?v=` dans `index.html` pour que les
   navigateurs rechargent les fichiers.
+- Road books : `roadbooks.json` associe une sortie (son `id` dans `events.json`) à un PDF Google Drive
+  (`"id-de-la-sortie": "id-du-fichier"`). La fiche de la sortie affiche alors un bouton « Road book » qui ouvre
+  `#roadbook-<id>` (aperçu + téléchargement). Le PDF doit être partagé « Tous les utilisateurs disposant du lien ».

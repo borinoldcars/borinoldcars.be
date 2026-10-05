@@ -51,7 +51,7 @@
   ];
 
   // ---------- Données ----------
-  const D = { cfg: {}, members: {}, events: [], albums: [], shop: {}, cars: [] };
+  const D = { cfg: {}, members: {}, events: [], albums: [], shop: {}, cars: [], roadbooks: {} };
 
   function prepare(cfg, members, events, photos, shop) {
     D.cfg = cfg; D.members = members; D.shop = shop;
@@ -272,6 +272,7 @@
             <div class="actions">
               ${form ? signupButton(ev, form) : ""}
               ${album ? `<a class="btn outline" href="${link("album", album.id)}">Voir les photos (${pics(album).length || "album"})</a>` : ""}
+              ${D.roadbooks[ev.id] ? `<a class="btn outline" href="${link("roadbook", ev.id)}">Road book</a>` : ""}
             </div>
           </div>
         </article>`,
@@ -443,6 +444,23 @@
     };
   }
 
+  // Road book d'une sortie : PDF Google Drive affiché dans la page, avec téléchargement.
+  function pageRoadbook(id) {
+    const ev = D.events.find((e) => e.id === id);
+    const fileId = ev && D.roadbooks[ev.id];
+    if (!fileId) return { title: "Road book", html: notFound("#sorties", "Agenda", "Road book") };
+    const f = encodeURIComponent(fileId);
+    return {
+      title: `Road book · ${ev.titre}`,
+      html: `${back(link("sortie", ev.id), ev.titre)}
+        <div class="page-head"><p class="kicker">Road book</p><h1>${esc(ev.titre)}</h1>
+        <p class="muted">${esc(cap(longDate(ev.date)))}</p>
+        <div class="actions"><a class="btn" href="https://drive.google.com/uc?export=download&id=${f}" target="_blank" rel="noopener">Télécharger le road book (PDF)</a></div></div>
+        <div class="pdf-box"><iframe src="https://drive.google.com/file/d/${f}/preview" title="Road book : ${esc(ev.titre)}" loading="lazy" allow="autoplay"></iframe></div>
+        <p class="small muted">Le road book ne s'affiche pas ? <a href="https://drive.google.com/file/d/${f}/view" target="_blank" rel="noopener">Ouvrez-le dans Google Drive</a>.</p>`,
+    };
+  }
+
   function pageInscription(id) {
     const ev = D.events.find((e) => e.id === id);
     const formId = ev && tallyId(ev.inscription);
@@ -466,7 +484,7 @@
     [/^sorties$/, pageEvents], [/^sortie-(.+)$/, pageEvent],
     [/^voitures$/, pageCars], [/^voiture-(.+)$/, pageCar],
     [/^albums$/, pageAlbums], [/^album-(.+)$/, pageAlbum],
-    [/^adhesion$/, pageAdhesion], [/^inscription-(.+)$/, pageInscription], [/^commande$/, pageCommande],
+    [/^adhesion$/, pageAdhesion], [/^inscription-(.+)$/, pageInscription], [/^commande$/, pageCommande], [/^roadbook-(.+)$/, pageRoadbook],
   ];
   const main = $("main"), page = $("#page");
   const baseTitle = document.title;
@@ -513,7 +531,10 @@
   $("#year").textContent = new Date().getFullYear();
 
   route();
-  Promise.all(["config", "members", "events", "photos", "boutique"].map(load)).then((all) => {
+  // Road books des sorties (roadbooks.json de ce dépôt : "id-de-la-sortie": "id-du-fichier-Drive").
+  const roadbooks = fetch("roadbooks.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+  Promise.all(["config", "members", "events", "photos", "boutique"].map(load).concat(roadbooks)).then((all) => {
+    D.roadbooks = all.pop() || {};
     prepare(...all);
     // Une partie en erreur n'empêche pas le reste de s'afficher.
     try { renderHome(); } catch (e) { console.error(e); }
