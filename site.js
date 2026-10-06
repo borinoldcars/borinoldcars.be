@@ -227,6 +227,19 @@
       </div>`).join("");
   }
 
+  function renderSponsors(data) {
+    const list = (data && data.sponsors) || [];
+    if (!list.length) return;
+    $("#sponsors").innerHTML = list.map((sp) => {
+      const inner = `<img src="${esc(sp.logo)}" alt="${esc(sp.nom)}" loading="lazy">
+        <span class="sp-name">${esc(sp.nom)}</span>${sp.description ? `<span class="sp-desc">${esc(sp.description)}</span>` : ""}`;
+      return isUrl(sp.lien)
+        ? `<a class="sponsor" href="${esc(sp.lien)}" target="_blank" rel="noopener">${inner}</a>`
+        : `<div class="sponsor">${inner}</div>`;
+    }).join("");
+    $("#partenaires").hidden = false;
+  }
+
   // ---------- Pages ----------
   const back = (href, label) => `<a class="back" href="${href}">‹ ${esc(label)}</a>`;
   const notFound = (href, label, what) => `${back(href, label)}<p class="empty">${what} introuvable.</p>`;
@@ -537,6 +550,8 @@
   route();
   // Road books des sorties (roadbooks.json de ce dépôt : "id-de-la-sortie": "id-du-fichier-Drive").
   const roadbooks = fetch("roadbooks.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+  // Partenaires (sponsors.json de ce dépôt).
+  fetch("sponsors.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({})).then(renderSponsors);
   Promise.all(["config", "members", "events", "photos", "boutique"].map(load).concat(roadbooks)).then((all) => {
     D.roadbooks = all.pop() || {};
     prepare(...all);

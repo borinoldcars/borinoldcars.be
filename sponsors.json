@@ -1,0 +1,7 @@
+{
+ "sponsors": [
+  { "nom": "La Piazzetta", "description": "Restaurant pizzeria · Grand-Place, Dour", "logo": "sponsors/la-piazzetta.webp", "lien": "" },
+  { "nom": "Logissim", "description": "Agence immobilière", "logo": "sponsors/logissim.webp", "lien": "" },
+  { "nom": "The Place to Be", "description": "Taverne", "logo": "sponsors/the-place-to-be.webp", "lien": "" }
+ ]
+}

@@ -24,3 +24,5 @@ Site vitrine public du club **Borin'Old Cars** : https://borinoldcars.be
   (`"id-de-la-sortie": "id-du-fichier"`, ou `{ "pdf": "id", "gpx": "id" }` pour ajouter le bouton
   « Télécharger le GPX »). La fiche de la sortie affiche alors un bouton « Road book » qui ouvre
   `#roadbook-<id>` (aperçu + téléchargement). Les fichiers doivent être partagés « Tous les utilisateurs disposant du lien ».
+- Partenaires : `sponsors.json` (`nom`, `description`, `logo` dans `sponsors/`, `lien` facultatif). La section
+  « Nos partenaires » s'affiche en bas de l'accueil dès qu'il y a au moins un partenaire.
