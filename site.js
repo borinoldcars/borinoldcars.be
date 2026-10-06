@@ -447,15 +447,19 @@
   // Road book d'une sortie : PDF Google Drive affiché dans la page, avec téléchargement.
   function pageRoadbook(id) {
     const ev = D.events.find((e) => e.id === id);
-    const fileId = ev && D.roadbooks[ev.id];
+    // Valeur : id du PDF, ou { "pdf": id, "gpx": id } quand il y a aussi une trace GPS.
+    const rb = ev && D.roadbooks[ev.id];
+    const fileId = rb && (typeof rb === "string" ? rb : rb.pdf);
     if (!fileId) return { title: "Road book", html: notFound("#sorties", "Agenda", "Road book") };
     const f = encodeURIComponent(fileId);
+    const gpx = typeof rb === "object" && rb.gpx ? encodeURIComponent(rb.gpx) : "";
     return {
       title: `Road book · ${ev.titre}`,
       html: `${back(link("sortie", ev.id), ev.titre)}
         <div class="page-head"><p class="kicker">Road book</p><h1>${esc(ev.titre)}</h1>
         <p class="muted">${esc(cap(longDate(ev.date)))}</p>
-        <div class="actions"><a class="btn" href="https://drive.google.com/uc?export=download&id=${f}" target="_blank" rel="noopener">Télécharger le road book (PDF)</a></div></div>
+        <div class="actions"><a class="btn" href="https://drive.google.com/uc?export=download&id=${f}" target="_blank" rel="noopener">Télécharger le road book (PDF)</a>
+        ${gpx ? `<a class="btn" href="https://drive.google.com/uc?export=download&id=${gpx}" target="_blank" rel="noopener">Télécharger le GPX</a>` : ""}</div></div>
         <div class="pdf-box"><iframe src="https://drive.google.com/file/d/${f}/preview" title="Road book : ${esc(ev.titre)}" loading="lazy" allow="autoplay"></iframe></div>
         <p class="small muted">Le road book ne s'affiche pas ? <a href="https://drive.google.com/file/d/${f}/view" target="_blank" rel="noopener">Ouvrez-le dans Google Drive</a>.</p>`,
     };

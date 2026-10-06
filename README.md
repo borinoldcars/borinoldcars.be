@@ -21,5 +21,6 @@ Site vitrine public du club **Borin'Old Cars** : https://borinoldcars.be
 - Après une modification de `site.css` ou `site.js`, augmenter le numéro `?v=` dans `index.html` pour que les
   navigateurs rechargent les fichiers.
 - Road books : `roadbooks.json` associe une sortie (son `id` dans `events.json`) à un PDF Google Drive
-  (`"id-de-la-sortie": "id-du-fichier"`). La fiche de la sortie affiche alors un bouton « Road book » qui ouvre
-  `#roadbook-<id>` (aperçu + téléchargement). Le PDF doit être partagé « Tous les utilisateurs disposant du lien ».
+  (`"id-de-la-sortie": "id-du-fichier"`, ou `{ "pdf": "id", "gpx": "id" }` pour ajouter le bouton
+  « Télécharger le GPX »). La fiche de la sortie affiche alors un bouton « Road book » qui ouvre
+  `#roadbook-<id>` (aperçu + téléchargement). Les fichiers doivent être partagés « Tous les utilisateurs disposant du lien ».
