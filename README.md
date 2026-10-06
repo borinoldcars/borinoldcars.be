@@ -26,3 +26,5 @@ Site vitrine public du club **Borin'Old Cars** : https://borinoldcars.be
   `#roadbook-<id>` (aperçu + téléchargement). Les fichiers doivent être partagés « Tous les utilisateurs disposant du lien ».
 - Partenaires : `sponsors.json` (`nom`, `description`, `logo` dans `sponsors/`, `lien` facultatif). La section
   « Nos partenaires » s'affiche en bas de l'accueil dès qu'il y a au moins un partenaire.
+- Portraits du comité : `portraits.json` (`"slug-du-membre": "portraits/fichier.webp"`, le slug est celui de
+  `config.json` → `comite`). Image carrée détourée ; elle s'affiche en rond sur la carte du membre.

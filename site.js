@@ -51,7 +51,7 @@
   ];
 
   // ---------- Données ----------
-  const D = { cfg: {}, members: {}, events: [], albums: [], shop: {}, cars: [], roadbooks: {} };
+  const D = { cfg: {}, members: {}, events: [], albums: [], shop: {}, cars: [], roadbooks: {}, portraits: {} };
 
   function prepare(cfg, members, events, photos, shop) {
     D.cfg = cfg; D.members = members; D.shop = shop;
@@ -183,7 +183,8 @@
       const cars = D.cars.filter((v) => v.slug === c.membre).sort((x, y) => carName(x).localeCompare(carName(y), "fr"));
       const list = cars.length ? cars.map((v) => `<li><a href="${link("voiture", v.id)}">${esc(carName(v))}</a></li>`).join("")
         : m.marque ? `<li>${esc(carName(m))}</li>` : "";
-      return `<div class="member"><strong>${esc(m.prenom)} ${esc(m.nom)}</strong><span>${esc(c.fonction)}</span>${list ? `<ul class="member-cars">${list}</ul>` : ""}</div>`;
+      const photo = D.portraits[c.membre];
+      return `<div class="member${photo ? " has-photo" : ""}">${photo ? `<img class="member-photo" src="${esc(photo)}" alt="${esc(m.prenom)} ${esc(m.nom)}" loading="lazy">` : ""}<strong>${esc(m.prenom)} ${esc(m.nom)}</strong><span>${esc(c.fonction)}</span>${list ? `<ul class="member-cars">${list}</ul>` : ""}</div>`;
     }).join("");
 
     // Chiffres
@@ -552,7 +553,10 @@
   const roadbooks = fetch("roadbooks.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
   // Partenaires (sponsors.json de ce dépôt).
   fetch("sponsors.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({})).then(renderSponsors);
-  Promise.all(["config", "members", "events", "photos", "boutique"].map(load).concat(roadbooks)).then((all) => {
+  // Portraits du comité (portraits.json de ce dépôt : "slug-du-membre": "portraits/fichier.webp").
+  const portraits = fetch("portraits.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+  Promise.all(["config", "members", "events", "photos", "boutique"].map(load).concat(roadbooks, portraits)).then((all) => {
+    D.portraits = all.pop() || {};
     D.roadbooks = all.pop() || {};
     prepare(...all);
     // Une partie en erreur n'empêche pas le reste de s'afficher.
