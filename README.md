@@ -28,3 +28,6 @@ Site vitrine public du club **Borin'Old Cars** : https://borinoldcars.be
   « Nos partenaires » s'affiche en bas de l'accueil dès qu'il y a au moins un partenaire.
 - Portraits du comité : `portraits.json` (`"slug-du-membre": "portraits/fichier.webp"`, le slug est celui de
   `config.json` → `comite`). Image carrée détourée ; elle s'affiche en rond sur la carte du membre.
+- Affiches de l'agenda : le robot « Copie des affiches de l'agenda » (`.github/workflows/affiches.yml`,
+  toutes les 3 heures) copie les affiches Google Drive dans `affiches/` ; le site les affiche depuis
+  borinoldcars.be et ne repasse par Drive que pour une affiche pas encore copiée.

@@ -51,11 +51,12 @@
   ];
 
   // ---------- Données ----------
-  const D = { cfg: {}, members: {}, events: [], albums: [], shop: {}, cars: [], roadbooks: {}, portraits: {} };
+  const D = { cfg: {}, members: {}, events: [], albums: [], shop: {}, cars: [], roadbooks: {}, portraits: {}, affiches: {} };
 
   function prepare(cfg, members, events, photos, shop) {
     D.cfg = cfg; D.members = members; D.shop = shop;
-    D.events = (events.events || []).filter((e) => !e.exemple && parseDate(e.date)).sort((a, b) => a.date.localeCompare(b.date));
+    D.events = (events.events || []).filter((e) => !e.exemple && parseDate(e.date)).sort((a, b) => a.date.localeCompare(b.date))
+      .map((e) => Object.assign({}, e, { image: localPoster(e.image) }));
     D.albums = (photos.albums || []).filter((a) => !a.exemple).sort((a, b) => (b.date || "").localeCompare(a.date || ""));
     const extra = cfg.photos_vehicules || {};
     D.cars = (members.vehicules || []).map((v) => Object.assign({}, v, { photo: extra[v.id] || v.photo }))
@@ -63,6 +64,12 @@
       .sort((a, b) => rank(a) - rank(b) || (b.photo ? 1 : 0) - (a.photo ? 1 : 0) || carName(a).localeCompare(carName(b), "fr"));
   }
 
+  // Affiche copiée sur le site (affiches/index.json, mis à jour par un robot GitHub), sinon le lien Drive.
+  function localPoster(url) {
+    const m = /[?&]id=([\w-]+)|\/d\/([\w-]+)/.exec(url || "");
+    const id = m && (m[1] || m[2]);
+    return (id && D.affiches[id]) || url;
+  }
   const driveImg = (id, w) => `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w${w}`;
   const pics = (a) => (a.photos || []).map((u) => ({ thumb: u, full: u }))
     .concat((a.drive || []).map((id) => ({ thumb: driveImg(id, 400), full: driveImg(id, 1600) })));
@@ -92,7 +99,7 @@
             <div class="meta">${[hours, ev.lieu].filter(Boolean).map(esc).join(" · ")}</div>
             ${ev.prix ? `<div class="price">${esc(ev.prix)}</div>` : ""}
           </div>
-          ${ev.image ? `<a class="thumb" href="${link("sortie", ev.id)}" tabindex="-1"><img src="${esc(ev.image)}" alt="Affiche : ${esc(ev.titre)}" loading="lazy" onerror="this.parentNode.remove()"></a>` : ""}
+          ${ev.image ? `<a class="thumb" href="${link("sortie", ev.id)}" tabindex="-1"><img referrerpolicy="no-referrer" src="${esc(ev.image)}" alt="Affiche : ${esc(ev.titre)}" loading="lazy" onerror="this.parentNode.remove()"></a>` : ""}
         </div>
         <div class="actions">
           ${form ? signupButton(ev, form) : ""}
@@ -123,7 +130,7 @@
     const n = pics(a).length;
     const c = albumCover(a);
     return `<a class="album" href="${link("album", a.id)}">
-        ${c ? `<img src="${esc(c)}" alt="" loading="lazy" onerror="this.remove()">` : ""}
+        ${c ? `<img referrerpolicy="no-referrer" src="${esc(c)}" alt="" loading="lazy" onerror="this.remove()">` : ""}
         <div class="cap"><strong>${esc(a.titre)}</strong><span>${esc(longDate(a.date))}${n ? ` · ${n} photos` : ""}</span></div>
       </a>`;
   }
@@ -271,7 +278,7 @@
       title: ev.titre,
       html: `${back("#sorties", "Agenda")}
         <article class="detail">
-          ${ev.image ? `<button class="detail-poster" data-zoom="${esc(ev.image)}" aria-label="Agrandir l'affiche"><img src="${esc(ev.image)}" alt="Affiche : ${esc(ev.titre)}" onerror="this.parentNode.remove()"></button>` : ""}
+          ${ev.image ? `<button class="detail-poster" data-zoom="${esc(ev.image)}" aria-label="Agrandir l'affiche"><img referrerpolicy="no-referrer" src="${esc(ev.image)}" alt="Affiche : ${esc(ev.titre)}" onerror="this.parentNode.remove()"></button>` : ""}
           <div class="detail-body">
             ${ev.ruban === "rose" ? '<span class="pill rose-pill">Octobre rose</span>' : ""}
             ${past ? '<span class="pill">Sortie passée</span>' : ""}
@@ -388,7 +395,7 @@
         <div class="page-head"><p class="kicker">Album photos</p><h1>${esc(a.titre)}</h1>
         <p class="muted">${esc(cap(longDate(a.date)))}${list.length ? ` · ${list.length} photos` : ""}</p>
         ${ev ? `<p><a class="link" href="${link("sortie", ev.id)}">À propos de cette sortie ›</a></p>` : ""}</div>
-        ${list.length ? `<div class="mosaic">${list.map((p, i) => `<button data-i="${i}" aria-label="Agrandir la photo ${i + 1}"><img src="${esc(p.thumb)}" alt="" loading="lazy" onerror="this.parentNode.remove()"></button>`).join("")}</div>`
+        ${list.length ? `<div class="mosaic">${list.map((p, i) => `<button data-i="${i}" aria-label="Agrandir la photo ${i + 1}"><img referrerpolicy="no-referrer" src="${esc(p.thumb)}" alt="" loading="lazy" onerror="this.parentNode.remove()"></button>`).join("")}</div>`
           : folder ? `<p><a class="btn" href="${esc(folder)}" target="_blank" rel="noopener">Voir les photos sur Google Drive</a></p>`
           : '<p class="empty">Pas encore de photos dans cet album.</p>'}`,
       bind(root) {
@@ -555,7 +562,9 @@
   fetch("sponsors.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({})).then(renderSponsors);
   // Portraits du comité (portraits.json de ce dépôt : "slug-du-membre": "portraits/fichier.webp").
   const portraits = fetch("portraits.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
-  Promise.all(["config", "members", "events", "photos", "boutique"].map(load).concat(roadbooks, portraits)).then((all) => {
+  const affiches = fetch("affiches/index.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+  Promise.all(["config", "members", "events", "photos", "boutique"].map(load).concat(roadbooks, portraits, affiches)).then((all) => {
+    D.affiches = all.pop() || {};
     D.portraits = all.pop() || {};
     D.roadbooks = all.pop() || {};
     prepare(...all);
