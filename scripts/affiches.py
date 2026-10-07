@@ -4,7 +4,8 @@ Lit l'agenda de l'application (events.json), télécharge chaque affiche Google 
 moyenne et écrit affiches/index.json ("id-du-fichier-Drive": "affiches/fichier").
 Le site affiche ces copies : il ne dépend plus de l'affichage direct depuis Drive.
 """
-import json, os, re, urllib.request
+import io, json, os, re, urllib.request
+from PIL import Image
 
 EVENTS = "https://borinoldcars.github.io/app/data/events.json"
 OUT = "affiches"
@@ -32,8 +33,14 @@ def main():
         if not ctype.startswith("image/") or len(data) < 1000:
             print("pas une image", fid, ctype)
             continue
-        ext = ".png" if "png" in ctype else ".jpg"
-        name = f"{OUT}/{fid}{ext}"
+        # JPEG allégé (largeur 1200 px max) : rapide à charger sur téléphone.
+        im = Image.open(io.BytesIO(data)).convert("RGB")
+        im.thumbnail((1200, 2400))
+        buf = io.BytesIO(); im.save(buf, "JPEG", quality=82, optimize=True, progressive=True); data = buf.getvalue()
+        name = f"{OUT}/{fid}.jpg"
+        old = f"{OUT}/{fid}.png"
+        if os.path.exists(old):
+            os.remove(old)
         if not os.path.exists(name) or open(name, "rb").read() != data:
             open(name, "wb").write(data)
             print("mise à jour", name)

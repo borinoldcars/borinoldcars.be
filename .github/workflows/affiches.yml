@@ -21,7 +21,9 @@ jobs:
         with:
           python-version: "3.11"
       - name: Copier les affiches depuis Google Drive
-        run: python scripts/affiches.py
+        run: |
+          pip install pillow
+          python scripts/affiches.py
       - name: Enregistrer si quelque chose a changé
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
