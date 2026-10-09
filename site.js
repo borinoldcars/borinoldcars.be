@@ -235,6 +235,24 @@
       </div>`).join("");
   }
 
+  // Revue de presse (presse.json : titre, media, date AAAA-MM-JJ, lien, extrait facultatif), la plus récente d'abord.
+  function renderPress(data) {
+    const list = ((data && data.articles) || []).filter((a) => isUrl(a.lien))
+      .sort((x, y) => (y.date || "").localeCompare(x.date || ""));
+    if (!list.length) return;
+    $("#press").innerHTML = list.map((a) => {
+      let site = a.media || "";
+      if (!site) { try { site = new URL(a.lien).hostname.replace(/^www\./, ""); } catch (e) { /* lien invalide */ } }
+      return `<a class="press-item" href="${esc(a.lien)}" target="_blank" rel="noopener">
+        <span class="press-meta">${[site, a.date ? longDate(a.date).replace(/^\S+ /, "") : ""].filter(Boolean).map(esc).join(" · ")}</span>
+        <strong>${esc(a.titre || "Lire l'article")}</strong>
+        ${a.extrait ? `<span class="press-quote">« ${esc(a.extrait)} »</span>` : ""}
+        <span class="press-more">Lire l'article ›</span>
+      </a>`;
+    }).join("");
+    $("#presse").hidden = false;
+  }
+
   function renderSponsors(data) {
     const list = (data && data.sponsors) || [];
     if (!list.length) return;
@@ -559,6 +577,7 @@
   // Road books des sorties (roadbooks.json de ce dépôt : "id-de-la-sortie": "id-du-fichier-Drive").
   const roadbooks = fetch("roadbooks.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
   // Partenaires (sponsors.json de ce dépôt).
+  fetch("presse.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({})).then(renderPress);
   fetch("sponsors.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({})).then(renderSponsors);
   // Portraits du comité (portraits.json de ce dépôt : "slug-du-membre": "portraits/fichier.webp").
   const portraits = fetch("portraits.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));

@@ -362,3 +362,12 @@ a.sponsor:hover img { transform: translateY(-3px); }
 .sp-name { font-weight: 700; }
 .sp-desc { color: var(--muted); font-size: .88rem; }
 @media (max-width: 560px) { .sponsors { gap: 14px; } .sponsor { flex-basis: calc(50% - 7px); } }
+
+/* Revue de presse */
+.press { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.press-item { display: flex; flex-direction: column; gap: 8px; padding: 20px; background: var(--bg); border-radius: var(--radius); box-shadow: var(--shadow); border-left: 3px solid var(--gold); text-decoration: none; color: inherit; transition: transform .2s; }
+.press-item:hover { transform: translateY(-2px); }
+.press-meta { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--brass); font-weight: 700; }
+.press-item strong { font-size: 1.1rem; line-height: 1.3; }
+.press-quote { font-style: italic; color: var(--muted); font-size: .95rem; }
+.press-more { margin-top: auto; color: var(--brass); font-weight: 700; font-size: .9rem; }

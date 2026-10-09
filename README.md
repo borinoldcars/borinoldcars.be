@@ -31,3 +31,5 @@ Site vitrine public du club **Borin'Old Cars** : https://borinoldcars.be
 - Affiches de l'agenda : le robot « Copie des affiches de l'agenda » (`.github/workflows/affiches.yml`,
   toutes les 3 heures) copie les affiches Google Drive dans `affiches/` ; le site les affiche depuis
   borinoldcars.be et ne repasse par Drive que pour une affiche pas encore copiée.
+- Revue de presse : `presse.json` (`titre`, `media`, `date` AAAA-MM-JJ, `lien`, `extrait` facultatif). La section
+  « Ils parlent de nous » s'affiche dès qu'il y a au moins un article.
