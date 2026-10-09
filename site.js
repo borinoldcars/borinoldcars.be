@@ -246,7 +246,8 @@
       // Vidéo YouTube : miniature et « Voir la vidéo ».
       const yt = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([\w-]{11})/.exec(a.lien);
       return `<a class="press-item${yt ? " press-video" : ""}" href="${esc(a.lien)}" target="_blank" rel="noopener">
-        ${yt ? `<span class="press-thumb"><img src="https://i.ytimg.com/vi/${yt[1]}/hqdefault.jpg" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="press-play" aria-hidden="true">▶</span></span>` : ""}
+        ${yt ? `<span class="press-thumb"><img src="https://i.ytimg.com/vi/${yt[1]}/hqdefault.jpg" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="press-play" aria-hidden="true">▶</span></span>`
+          : a.image ? `<span class="press-thumb"><img src="${esc(a.image)}" alt="" loading="lazy"></span>` : ""}
         <span class="press-meta">${[site, a.date ? longDate(a.date).replace(/^\S+ /, "") : ""].filter(Boolean).map(esc).join(" · ")}</span>
         <strong>${esc(a.titre || "Lire l'article")}</strong>
         ${a.extrait ? `<span class="press-quote">« ${esc(a.extrait)} »</span>` : ""}
