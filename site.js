@@ -243,11 +243,14 @@
     $("#press").innerHTML = list.map((a) => {
       let site = a.media || "";
       if (!site) { try { site = new URL(a.lien).hostname.replace(/^www\./, ""); } catch (e) { /* lien invalide */ } }
-      return `<a class="press-item" href="${esc(a.lien)}" target="_blank" rel="noopener">
+      // Vidéo YouTube : miniature et « Voir la vidéo ».
+      const yt = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([\w-]{11})/.exec(a.lien);
+      return `<a class="press-item${yt ? " press-video" : ""}" href="${esc(a.lien)}" target="_blank" rel="noopener">
+        ${yt ? `<span class="press-thumb"><img src="https://i.ytimg.com/vi/${yt[1]}/hqdefault.jpg" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="press-play" aria-hidden="true">▶</span></span>` : ""}
         <span class="press-meta">${[site, a.date ? longDate(a.date).replace(/^\S+ /, "") : ""].filter(Boolean).map(esc).join(" · ")}</span>
         <strong>${esc(a.titre || "Lire l'article")}</strong>
         ${a.extrait ? `<span class="press-quote">« ${esc(a.extrait)} »</span>` : ""}
-        <span class="press-more">Lire l'article ›</span>
+        <span class="press-more">${yt ? "Voir la vidéo ›" : "Lire l'article ›"}</span>
       </a>`;
     }).join("");
     $("#presse").hidden = false;
