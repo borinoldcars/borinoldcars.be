@@ -381,4 +381,5 @@ a.sponsor:hover img { transform: translateY(-3px); }
 .mosaic button.video { position: relative; background: #1e140d; }
 .mosaic .play { position: absolute; inset: 0; margin: auto; width: 46px; height: 46px; border-radius: 50%; background: rgba(47, 33, 24, .85); color: #f1e4cc; display: grid; place-items: center; font-size: 1.1rem; padding-left: 3px; pointer-events: none; }
 .lb-open { position: absolute; bottom: 44px; left: 50%; transform: translateX(-50%); white-space: nowrap; color: #2f2118; background: #d9bb8d; padding: 9px 16px; border-radius: 10px; font-weight: bold; text-decoration: none; font-size: .95rem; }
+.lb-mp4 { max-width: 94vw; max-height: 82vh; background: #000; border-radius: 6px; }
 .lb-video { width: min(92vw, 1100px); aspect-ratio: 16 / 9; max-height: 85vh; border: 0; background: #000; }

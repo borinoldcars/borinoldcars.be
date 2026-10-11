@@ -51,7 +51,7 @@
   ];
 
   // ---------- Données ----------
-  const D = { cfg: {}, members: {}, events: [], albums: [], shop: {}, cars: [], roadbooks: {}, portraits: {}, affiches: {} };
+  const D = { cfg: {}, members: {}, events: [], albums: [], shop: {}, cars: [], roadbooks: {}, portraits: {}, affiches: {}, videos: {} };
 
   function prepare(cfg, members, events, photos, shop) {
     D.cfg = cfg; D.members = members; D.shop = shop;
@@ -71,10 +71,14 @@
     return (id && D.affiches[id]) || url;
   }
   const driveImg = (id, w) => `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w${w}`;
-  // Contenu d'un album : photos, puis vidéos Google Drive (« videos », lues dans le lecteur Drive).
+  // Vidéo d'album : copie MP4 du site (videos/index.json, convertie par un robot GitHub), sinon le lecteur Drive.
+  const video = (id) => { const v = D.videos[id];
+    return v ? { thumb: v.poster, full: v.mp4, video: "mp4" }
+      : { thumb: driveImg(id, 480), full: `https://drive.google.com/file/d/${encodeURIComponent(id)}/preview`, video: true }; };
+  // Contenu d'un album : photos, puis vidéos.
   const pics = (a) => (a.photos || []).map((u) => ({ thumb: u, full: u }))
     .concat((a.drive || []).map((id) => ({ thumb: driveImg(id, 400), full: driveImg(id, 1600) })))
-    .concat((a.videos || []).map((id) => ({ thumb: driveImg(id, 480), full: `https://drive.google.com/file/d/${encodeURIComponent(id)}/preview`, video: true })));
+    .concat((a.videos || []).map(video));
   // « 12 photos · 1 vidéo »
   function albumCount(list) {
     const v = list.filter((p) => p.video).length, n = list.length - v;
@@ -147,25 +151,29 @@
   const lbImg = $("img", lb);
   const lbVideo = $(".lb-video", lb);
   const lbOpen = $(".lb-open", lb);
+  const lbMp4 = $(".lb-mp4", lb);
   let lbList = [], lbIndex = 0;
   function showPhoto(i) {
     lbIndex = (i + lbList.length) % lbList.length;
     // Éléments : lien d'image, ou { src, video } (vidéo Drive dans un lecteur intégré).
     const it = typeof lbList[lbIndex] === "string" ? { src: lbList[lbIndex] } : lbList[lbIndex];
+    const drive = it.video === true, mp4 = it.video === "mp4";
     lbImg.hidden = !!it.video;
-    lbVideo.hidden = !it.video;
-    lbOpen.hidden = !it.video;
-    if (it.video) { lbImg.removeAttribute("src"); lbVideo.src = it.src; lbOpen.href = it.src.replace(/\/preview$/, "/view"); }
-    else { lbVideo.removeAttribute("src"); lbImg.src = it.src; }
+    lbVideo.hidden = lbOpen.hidden = !drive;
+    lbMp4.hidden = !mp4;
+    lbMp4.pause();
+    if (!it.video) lbImg.src = it.src; else lbImg.removeAttribute("src");
+    if (drive) { lbVideo.src = it.src; lbOpen.href = it.src.replace(/\/preview$/, "/view"); } else lbVideo.removeAttribute("src");
+    if (mp4) { lbMp4.src = it.src; lbMp4.play().catch(() => {}); } else { lbMp4.removeAttribute("src"); lbMp4.load(); }
     $(".lb-count", lb).textContent = lbList.length > 1 ? `${lbIndex + 1} / ${lbList.length}` : "";
     $$(".lb-nav", lb).forEach((b) => { b.hidden = lbList.length < 2; });
   }
   function openPhotos(list, i) { lbList = list; showPhoto(i || 0); lb.hidden = false; document.body.classList.add("noscroll"); }
-  function closePhoto() { lb.hidden = true; lbImg.removeAttribute("src"); lbVideo.removeAttribute("src"); document.body.classList.remove("noscroll"); }
+  function closePhoto() { lb.hidden = true; lbImg.removeAttribute("src"); lbVideo.removeAttribute("src"); lbMp4.pause(); lbMp4.removeAttribute("src"); lbMp4.load(); document.body.classList.remove("noscroll"); }
   lb.addEventListener("click", (e) => {
     if (e.target.closest(".lb-prev")) showPhoto(lbIndex - 1);
     else if (e.target.closest(".lb-next")) showPhoto(lbIndex + 1);
-    else if (e.target !== lbImg && e.target !== lbVideo && !e.target.closest(".lb-open")) closePhoto();
+    else if (e.target !== lbImg && e.target !== lbVideo && e.target !== lbMp4 && !e.target.closest(".lb-open")) closePhoto();
   });
   document.addEventListener("keydown", (e) => {
     if (lb.hidden) return;
@@ -174,7 +182,7 @@
     if (e.key === "ArrowRight") showPhoto(lbIndex + 1);
   });
   let touchX = null;
-  lb.addEventListener("touchstart", (e) => { touchX = e.touches[0].clientX; }, { passive: true });
+  lb.addEventListener("touchstart", (e) => { touchX = e.target === lbMp4 ? null : e.touches[0].clientX; }, { passive: true });
   lb.addEventListener("touchend", (e) => {
     if (touchX == null) return;
     const dx = e.changedTouches[0].clientX - touchX;
@@ -601,7 +609,9 @@
   // Portraits du comité (portraits.json de ce dépôt : "slug-du-membre": "portraits/fichier.webp").
   const portraits = fetch("portraits.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
   const affiches = fetch("affiches/index.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
-  Promise.all(["config", "members", "events", "photos", "boutique"].map(load).concat(roadbooks, portraits, affiches)).then((all) => {
+  const videos = fetch("videos/index.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+  Promise.all(["config", "members", "events", "photos", "boutique"].map(load).concat(roadbooks, portraits, affiches, videos)).then((all) => {
+    D.videos = all.pop() || {};
     D.affiches = all.pop() || {};
     D.portraits = all.pop() || {};
     D.roadbooks = all.pop() || {};

@@ -1,0 +1,33 @@
+name: Conversion des vidéos des albums
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - scripts/videos.py
+      - .github/workflows/videos.yml
+  schedule:
+    - cron: "47 */3 * * *"
+
+concurrency: videos
+
+jobs:
+  videos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Installer ffmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Convertir les vidéos Google Drive en MP4
+        run: python scripts/videos.py
+      - name: Enregistrer si quelque chose a changé
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: conversion des vidéos des albums"
+          file_pattern: "videos/*"

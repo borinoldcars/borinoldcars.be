@@ -31,6 +31,11 @@ Site vitrine public du club **Borin'Old Cars** : https://borinoldcars.be
 - Affiches de l'agenda : le robot « Copie des affiches de l'agenda » (`.github/workflows/affiches.yml`,
   toutes les 3 heures) copie les affiches Google Drive dans `affiches/` ; le site les affiche depuis
   borinoldcars.be et ne repasse par Drive que pour une affiche pas encore copiée.
+- Vidéos des albums : le robot « Conversion des vidéos des albums » (`.github/workflows/videos.yml`,
+  toutes les 3 heures) télécharge les vidéos des albums (champ `videos` de l'application), les convertit
+  en MP4 lisible partout (les vidéos d'iPhone HEVC/HDR ne passent pas dans les navigateurs) et les range
+  dans `videos/` avec une image d'aperçu. En attendant la conversion, le site utilise le lecteur Drive.
+  Limite : une vidéo convertie doit faire moins de 90 Mo (environ 10 minutes en 720p).
 - Revue de presse : `presse.json` (`titre`, `media`, `date` AAAA-MM-JJ, `lien`, `extrait` et `image` facultatifs ; images dans `presse/`,
   miniature automatique pour une vidéo YouTube). La section
   « Ils parlent de nous » s'affiche dès qu'il y a au moins un article.
