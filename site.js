@@ -294,6 +294,7 @@
           <h3>${esc(n.titre)}</h3>
           ${n.texte ? `<p>${esc(n.texte)}</p>` : ""}
           ${n.lien ? `<a class="press-more" href="${esc(n.lien)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(n.lien_texte || "En savoir plus")} ›</a>` : ""}
+          ${(n.liens || []).filter((l) => isUrl(l.url)).map((l) => `<a class="press-more" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.texte || "En savoir plus")} ›</a>`).join("")}
         </div>
       </article>`;
     }).join("");

@@ -37,7 +37,7 @@ Site vitrine public du club **Borin'Old Cars** : https://borinoldcars.be
   dans `videos/` avec une image d'aperçu. En attendant la conversion, le site utilise le lecteur Drive.
   Limite : une vidéo convertie doit faire moins de 90 Mo (environ 10 minutes en 720p).
 - Actualités : `actus.json` (`date` AAAA-MM-JJ, `titre`, `texte`, `image` facultative dans `actus/`, `lien` et
-  `lien_texte` facultatifs ; un lien `#album-…` mène à un album). Les 3 plus récentes s'affichent sous les chiffres
+  `lien_texte` facultatifs, `liens` : liste de liens externes `{texte, url}` ; un lien `#album-…` mène à un album). Les 3 plus récentes s'affichent sous les chiffres
   du club ; la section est masquée s'il n'y en a aucune.
 - Revue de presse : `presse.json` (`titre`, `media`, `date` AAAA-MM-JJ, `lien`, `extrait` et `image` facultatifs ; images dans `presse/`,
   miniature automatique pour une vidéo YouTube). La section
