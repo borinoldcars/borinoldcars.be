@@ -145,9 +145,11 @@ p { margin: 0 0 1em; }
   background: rgba(217, 187, 141, .25); border-top: 1px solid rgba(217, 187, 141, .25);
 }
 @media (min-width: 700px) { .stats { grid-template-columns: repeat(4, 1fr); } }
-.stats > div { background: #2a1d14; padding: 20px 12px; text-align: center; }
+.stats > div, .stats > a { background: #2a1d14; padding: 20px 12px; text-align: center; }
 .stats strong { display: block; font-size: 2rem; color: #d9bb8d; line-height: 1.1; }
 .stats span { font-size: .9rem; opacity: .85; }
+.stats > a.stat-link { color: inherit; text-decoration: none; transition: background .2s; }
+.stats > a.stat-link:hover, .stats > a.stat-link:focus-visible { background: #3a2a1d; }
 
 /* Sections */
 .section { padding: 72px 0; }
