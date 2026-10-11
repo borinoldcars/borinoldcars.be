@@ -374,3 +374,8 @@ a.sponsor:hover img { transform: translateY(-3px); }
 .press-thumb { position: relative; display: block; margin: -20px -20px 4px; aspect-ratio: 16 / 9; overflow: hidden; border-radius: var(--radius) var(--radius) 0 0; background: #1e140d; }
 .press-thumb img { width: 100%; height: 100%; object-fit: cover; }
 .press-play { position: absolute; inset: 0; margin: auto; width: 56px; height: 56px; border-radius: 50%; background: rgba(47, 33, 24, .85); color: #f1e4cc; display: grid; place-items: center; font-size: 1.3rem; padding-left: 4px; }
+
+/* Vidéos des albums */
+.mosaic button.video { position: relative; background: #1e140d; }
+.mosaic .play { position: absolute; inset: 0; margin: auto; width: 46px; height: 46px; border-radius: 50%; background: rgba(47, 33, 24, .85); color: #f1e4cc; display: grid; place-items: center; font-size: 1.1rem; padding-left: 3px; pointer-events: none; }
+.lb-video { width: min(92vw, 1100px); aspect-ratio: 16 / 9; max-height: 85vh; border: 0; background: #000; }

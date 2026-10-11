@@ -71,8 +71,15 @@
     return (id && D.affiches[id]) || url;
   }
   const driveImg = (id, w) => `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w${w}`;
+  // Contenu d'un album : photos, puis vidéos Google Drive (« videos », lues dans le lecteur Drive).
   const pics = (a) => (a.photos || []).map((u) => ({ thumb: u, full: u }))
-    .concat((a.drive || []).map((id) => ({ thumb: driveImg(id, 400), full: driveImg(id, 1600) })));
+    .concat((a.drive || []).map((id) => ({ thumb: driveImg(id, 400), full: driveImg(id, 1600) })))
+    .concat((a.videos || []).map((id) => ({ thumb: driveImg(id, 480), full: `https://drive.google.com/file/d/${encodeURIComponent(id)}/preview`, video: true })));
+  // « 12 photos · 1 vidéo »
+  function albumCount(list) {
+    const v = list.filter((p) => p.video).length, n = list.length - v;
+    return [n ? `${n} photo${n > 1 ? "s" : ""}` : "", v ? `${v} vidéo${v > 1 ? "s" : ""}` : ""].filter(Boolean).join(" · ");
+  }
   const eventOfAlbum = (a) => D.events.find((e) => a.evenement === e.id || (a.date && a.date === e.date));
   const albumOfEvent = (ev) => D.albums.find((a) => a.evenement === ev.id || (a.date && a.date === ev.date));
   function albumCover(a) {
@@ -127,30 +134,36 @@
   }
 
   function albumCard(a) {
-    const n = pics(a).length;
+    const n = albumCount(pics(a));
     const c = albumCover(a);
     return `<a class="album" href="${link("album", a.id)}">
         ${c ? `<img referrerpolicy="no-referrer" src="${esc(c)}" alt="" loading="lazy" onerror="this.remove()">` : ""}
-        <div class="cap"><strong>${esc(a.titre)}</strong><span>${esc(longDate(a.date))}${n ? ` · ${n} photos` : ""}</span></div>
+        <div class="cap"><strong>${esc(a.titre)}</strong><span>${esc(longDate(a.date))}${n ? ` · ${n}` : ""}</span></div>
       </a>`;
   }
 
   // ---------- Visionneuse ----------
   const lb = $("#lightbox");
   const lbImg = $("img", lb);
+  const lbVideo = $(".lb-video", lb);
   let lbList = [], lbIndex = 0;
   function showPhoto(i) {
     lbIndex = (i + lbList.length) % lbList.length;
-    lbImg.src = lbList[lbIndex];
+    // Éléments : lien d'image, ou { src, video } (vidéo Drive dans un lecteur intégré).
+    const it = typeof lbList[lbIndex] === "string" ? { src: lbList[lbIndex] } : lbList[lbIndex];
+    lbImg.hidden = !!it.video;
+    lbVideo.hidden = !it.video;
+    if (it.video) { lbImg.removeAttribute("src"); lbVideo.src = it.src; }
+    else { lbVideo.removeAttribute("src"); lbImg.src = it.src; }
     $(".lb-count", lb).textContent = lbList.length > 1 ? `${lbIndex + 1} / ${lbList.length}` : "";
     $$(".lb-nav", lb).forEach((b) => { b.hidden = lbList.length < 2; });
   }
   function openPhotos(list, i) { lbList = list; showPhoto(i || 0); lb.hidden = false; document.body.classList.add("noscroll"); }
-  function closePhoto() { lb.hidden = true; lbImg.src = ""; document.body.classList.remove("noscroll"); }
+  function closePhoto() { lb.hidden = true; lbImg.removeAttribute("src"); lbVideo.removeAttribute("src"); document.body.classList.remove("noscroll"); }
   lb.addEventListener("click", (e) => {
     if (e.target.closest(".lb-prev")) showPhoto(lbIndex - 1);
     else if (e.target.closest(".lb-next")) showPhoto(lbIndex + 1);
-    else if (e.target !== lbImg) closePhoto();
+    else if (e.target !== lbImg && e.target !== lbVideo) closePhoto();
   });
   document.addEventListener("keydown", (e) => {
     if (lb.hidden) return;
@@ -201,7 +214,7 @@
     set("vehicules", D.cars.length || "—");
     set("sorties", D.events.filter((e) => e.date.startsWith(String(year))).length || "—");
     set("annee", year);
-    const n = D.albums.reduce((t, a) => t + pics(a).length, 0);
+    const n = D.albums.reduce((t, a) => t + pics(a).filter((p) => !p.video).length, 0);
     set("photos", n ? n.toLocaleString("fr-BE") : "—");
 
     // Agenda : prochaines sorties, sinon les dernières.
@@ -415,13 +428,13 @@
       title: a.titre,
       html: `${back("#albums", "Albums")}
         <div class="page-head"><p class="kicker">Album photos</p><h1>${esc(a.titre)}</h1>
-        <p class="muted">${esc(cap(longDate(a.date)))}${list.length ? ` · ${list.length} photos` : ""}</p>
+        <p class="muted">${esc(cap(longDate(a.date)))}${list.length ? ` · ${albumCount(list)}` : ""}</p>
         ${ev ? `<p><a class="link" href="${link("sortie", ev.id)}">À propos de cette sortie ›</a></p>` : ""}</div>
-        ${list.length ? `<div class="mosaic">${list.map((p, i) => `<button data-i="${i}" aria-label="Agrandir la photo ${i + 1}"><img referrerpolicy="no-referrer" src="${esc(p.thumb)}" alt="" loading="lazy" onerror="this.parentNode.remove()"></button>`).join("")}</div>`
+        ${list.length ? `<div class="mosaic">${list.map((p, i) => `<button data-i="${i}"${p.video ? ' class="video"' : ""} aria-label="${p.video ? "Lire la vidéo" : "Agrandir la photo"} ${i + 1}"><img referrerpolicy="no-referrer" src="${esc(p.thumb)}" alt="" loading="lazy" onerror="${p.video ? "this.style.visibility='hidden'" : "this.parentNode.remove()"}">${p.video ? '<span class="play" aria-hidden="true">▶</span>' : ""}</button>`).join("")}</div>`
           : folder ? `<p><a class="btn" href="${esc(folder)}" target="_blank" rel="noopener">Voir les photos sur Google Drive</a></p>`
           : '<p class="empty">Pas encore de photos dans cet album.</p>'}`,
       bind(root) {
-        const full = list.map((p) => p.full);
+        const full = list.map((p) => ({ src: p.full, video: p.video }));
         const m = $(".mosaic", root);
         if (m) m.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) openPhotos(full, +b.dataset.i); });
       },
