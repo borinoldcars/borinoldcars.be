@@ -146,6 +146,7 @@
   const lb = $("#lightbox");
   const lbImg = $("img", lb);
   const lbVideo = $(".lb-video", lb);
+  const lbOpen = $(".lb-open", lb);
   let lbList = [], lbIndex = 0;
   function showPhoto(i) {
     lbIndex = (i + lbList.length) % lbList.length;
@@ -153,7 +154,8 @@
     const it = typeof lbList[lbIndex] === "string" ? { src: lbList[lbIndex] } : lbList[lbIndex];
     lbImg.hidden = !!it.video;
     lbVideo.hidden = !it.video;
-    if (it.video) { lbImg.removeAttribute("src"); lbVideo.src = it.src; }
+    lbOpen.hidden = !it.video;
+    if (it.video) { lbImg.removeAttribute("src"); lbVideo.src = it.src; lbOpen.href = it.src.replace(/\/preview$/, "/view"); }
     else { lbVideo.removeAttribute("src"); lbImg.src = it.src; }
     $(".lb-count", lb).textContent = lbList.length > 1 ? `${lbIndex + 1} / ${lbList.length}` : "";
     $$(".lb-nav", lb).forEach((b) => { b.hidden = lbList.length < 2; });
@@ -163,7 +165,7 @@
   lb.addEventListener("click", (e) => {
     if (e.target.closest(".lb-prev")) showPhoto(lbIndex - 1);
     else if (e.target.closest(".lb-next")) showPhoto(lbIndex + 1);
-    else if (e.target !== lbImg && e.target !== lbVideo) closePhoto();
+    else if (e.target !== lbImg && e.target !== lbVideo && !e.target.closest(".lb-open")) closePhoto();
   });
   document.addEventListener("keydown", (e) => {
     if (lb.hidden) return;
