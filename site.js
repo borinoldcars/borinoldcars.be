@@ -280,6 +280,26 @@
     $("#presse").hidden = false;
   }
 
+  // Actualités (actus.json de ce dépôt) : les 3 plus récentes.
+  function renderNews(data) {
+    const list = ((data && data.actus) || []).filter((n) => n.titre)
+      .sort((x, y) => (y.date || "").localeCompare(x.date || "")).slice(0, 3);
+    if (!list.length) return;
+    $("#news").innerHTML = list.map((n) => {
+      const ext = isUrl(n.lien);
+      return `<article class="news-item">
+        ${n.image ? `<img src="${esc(n.image)}" alt="" loading="lazy">` : ""}
+        <div class="news-body">
+          ${n.date ? `<p class="press-meta">${esc(longDate(n.date))}</p>` : ""}
+          <h3>${esc(n.titre)}</h3>
+          ${n.texte ? `<p>${esc(n.texte)}</p>` : ""}
+          ${n.lien ? `<a class="press-more" href="${esc(n.lien)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(n.lien_texte || "En savoir plus")} ›</a>` : ""}
+        </div>
+      </article>`;
+    }).join("");
+    $("#actus").hidden = false;
+  }
+
   function renderSponsors(data) {
     const list = (data && data.sponsors) || [];
     if (!list.length) return;
@@ -605,6 +625,7 @@
   const roadbooks = fetch("roadbooks.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
   // Partenaires (sponsors.json de ce dépôt).
   fetch("presse.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({})).then(renderPress);
+  fetch("actus.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({})).then(renderNews);
   fetch("sponsors.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({})).then(renderSponsors);
   // Portraits du comité (portraits.json de ce dépôt : "slug-du-membre": "portraits/fichier.webp").
   const portraits = fetch("portraits.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));

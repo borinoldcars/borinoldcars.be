@@ -366,6 +366,14 @@ a.sponsor:hover img { transform: translateY(-3px); }
 @media (max-width: 560px) { .sponsors { gap: 14px; } .sponsor { flex-basis: calc(50% - 7px); } }
 
 /* Revue de presse */
+.news { display: grid; gap: 20px; }
+.news-item { display: grid; background: var(--bg); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.news-item img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.news-body { padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 10px; }
+.news-body h3 { margin: 0; font-size: 1.4rem; line-height: 1.25; }
+.news-body p { margin: 0; }
+.news-body .press-more { margin-top: 4px; }
+@media (min-width: 800px) { .news-item { grid-template-columns: 1.3fr 1fr; } .news-item img { height: 100%; } .news-body { justify-content: center; padding: 28px 32px; } }
 .press { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
 .press-item { display: flex; flex-direction: column; gap: 8px; padding: 20px; background: var(--bg); border-radius: var(--radius); box-shadow: var(--shadow); border-left: 3px solid var(--gold); text-decoration: none; color: inherit; transition: transform .2s; }
 .press-item:hover { transform: translateY(-2px); }
