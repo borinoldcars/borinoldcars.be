@@ -331,13 +331,13 @@ body.noscroll { overflow: hidden; }
 .address { font-style: normal; font-weight: 700; margin-bottom: 1.2em; }
 
 /* Formulaire d'adhésion (Tally intégré) */
-/* Le formulaire Tally reprend les couleurs du site (texte brun foncé, fond transparent) :
-   il se pose directement sur le fond beige. En thème sombre, il garde un fond clair pour rester lisible. */
-.tally-box { max-width: 760px; margin-bottom: 16px; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .tally-box { background: #e5decf; border-radius: var(--radius); padding: 16px 12px 4px; }
-}
-:root[data-theme="dark"] .tally-box { background: #e5decf; border-radius: var(--radius); padding: 16px 12px 4px; }
+/* Le formulaire Tally (texte brun foncé, fond transparent) est posé dans un cadre brun café
+   titré « Votre inscription », avec un liseré doré : on le repère bien en faisant défiler.
+   Le fond crème garde le formulaire lisible aussi en thème sombre. */
+.tally-box { position: relative; max-width: 760px; margin-bottom: 16px; padding: 56px 20px 14px; background: #f4efe5;
+  border: 10px solid #2f2118; border-radius: 16px; outline: 1px solid #d9bb8d; outline-offset: -14px; box-shadow: 0 10px 30px rgba(47, 33, 24, .25); }
+.tally-box::before { content: attr(data-title); position: absolute; top: 0; left: 0; right: 0; padding: 10px 12px 12px; background: #2f2118; color: #d9bb8d;
+  text-align: center; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; font-size: .85rem; }
 .tally-box iframe { display: block; width: 100%; border: 0; min-height: 400px; }
 .page-head a:not(.btn) { color: var(--brass); }
 

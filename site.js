@@ -476,9 +476,9 @@
   // Un lien tally.so (adhésion, inscription à une sortie) s'affiche dans une page du site.
   // Les réponses arrivent dans Tally comme avant ; les questions se modifient dans Tally.
   const tallyId = (url) => { const m = /^https?:\/\/tally\.so\/(?:r|embed)\/([A-Za-z0-9]+)/i.exec(url || ""); return m ? m[1] : ""; };
-  function tallyEmbed(formId, title) {
+  function tallyEmbed(formId, title, label) {
     const src = `https://tally.so/embed/${formId}?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1`;
-    return `<div class="tally-box">
+    return `<div class="tally-box" data-title="${esc(label || "Votre inscription")}">
           <iframe data-tally-src="${src}" src="${src}" loading="lazy" width="100%" height="600" frameborder="0" marginheight="0" marginwidth="0" title="${esc(title)}"></iframe>
         </div>
         <p class="small muted">Le formulaire ne s'affiche pas ? <a href="https://tally.so/r/${formId}" target="_blank" rel="noopener">Ouvrez-le dans un nouvel onglet</a>.</p>`;
@@ -508,7 +508,7 @@
         <div class="page-head"><p class="kicker">Nous rejoindre</p><h1>Demande d'adhésion</h1>
         <p class="muted">Remplissez le formulaire ci-dessous pour demander à rejoindre le club.
         Une question avant de vous lancer ? Écrivez-nous à <a href="mailto:${esc(email)}">${esc(email)}</a>.</p></div>
-        ${tallyEmbed(ADHESION_FORM, "Demande d'adhésion à Borin'Old Cars")}`,
+        ${tallyEmbed(ADHESION_FORM, "Demande d'adhésion à Borin'Old Cars", "Votre demande d'adhésion")}`,
       bind: loadTally,
     };
   }
@@ -526,7 +526,7 @@
             ${a.image ? `<img src="${esc(asset(a.image))}" alt="" loading="lazy">` : ""}
             <span>${esc(a.nom)}</span><strong>${typeof a.prix === "number" ? a.prix.toLocaleString("fr-BE") + " €" : esc(a.prix)}</strong>
           </div>`).join("")}</div>` : ""}
-        ${tallyEmbed(formId, "Bon de commande Borin'Old Cars")}`,
+        ${tallyEmbed(formId, "Bon de commande Borin'Old Cars", "Votre commande")}`,
       bind: loadTally,
     };
   }
