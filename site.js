@@ -568,10 +568,15 @@
     return {
       title: `Inscription · ${ev.titre}`,
       html: `${back(link("sortie", ev.id), ev.titre)}
-        <div class="page-head"><p class="kicker">Inscription</p><h1>${esc(ev.titre)}</h1>
+        <div class="page-head head-poster"><div><p class="kicker">Inscription</p><h1>${esc(ev.titre)}</h1>
         <p class="muted">${[cap(longDate(ev.date)), hours, ev.lieu, ev.prix].filter(Boolean).map(esc).join(" · ")}</p></div>
+        ${ev.image ? `<button class="detail-poster" data-zoom="${esc(ev.image)}" aria-label="Agrandir l'affiche"><img referrerpolicy="no-referrer" src="${esc(ev.image)}" alt="Affiche : ${esc(ev.titre)}" onerror="this.parentNode.remove()"></button>` : ""}</div>
         ${tallyEmbed(formId, `Inscription : ${ev.titre}`)}`,
-      bind: loadTally,
+      bind(root) {
+        const z = $("[data-zoom]", root);
+        if (z) z.addEventListener("click", () => openPhotos([z.dataset.zoom], 0));
+        loadTally();
+      },
     };
   }
 

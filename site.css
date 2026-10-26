@@ -352,6 +352,11 @@ body.noscroll { overflow: hidden; }
 .hero-sketch { width: min(65%, 260px); height: auto; margin: 0 0 18px; opacity: .95; }
 
 /* Road book (PDF Google Drive) */
+/* Inscription : affiche à côté du titre. */
+.head-poster { display: flex; align-items: flex-start; gap: 16px; max-width: 760px; }
+.head-poster > div { flex: 1; min-width: 0; }
+.head-poster .detail-poster { flex: none; width: 96px; }
+@media (min-width: 700px) { .head-poster { gap: 28px; } .head-poster .detail-poster { width: 160px; } }
 .page-head .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
 .pdf-box { max-width: 900px; height: min(80vh, 1100px); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); background: var(--surface-2); margin-bottom: 12px; }
 .pdf-box iframe { width: 100%; height: 100%; border: 0; display: block; }
