@@ -280,25 +280,30 @@
     $("#presse").hidden = false;
   }
 
-  // Actualités (actus.json de ce dépôt) : les 3 plus récentes.
-  function renderNews(data) {
-    const list = ((data && data.actus) || []).filter((n) => n.titre)
-      .sort((x, y) => (y.date || "").localeCompare(x.date || "")).slice(0, 3);
-    if (!list.length) return;
-    $("#news").innerHTML = list.map((n) => {
-      const ext = isUrl(n.lien);
-      return `<article class="news-item">
+  // Page « Actualités du club » (actus.json de ce dépôt), de la plus récente à la plus ancienne.
+  function newsItem(n) {
+    const ext = isUrl(n.lien);
+    return `<article class="news-item">
         ${n.image ? `<img src="${esc(n.image)}" alt="" loading="lazy">` : ""}
         <div class="news-body">
           ${n.date ? `<p class="press-meta">${esc(longDate(n.date))}</p>` : ""}
-          <h3>${esc(n.titre)}</h3>
+          <h2>${esc(n.titre)}</h2>
           ${n.texte ? `<p>${esc(n.texte)}</p>` : ""}
           ${n.lien ? `<a class="press-more" href="${esc(n.lien)}"${ext ? ' target="_blank" rel="noopener"' : ""}>${esc(n.lien_texte || "En savoir plus")} ›</a>` : ""}
           ${(n.liens || []).filter((l) => isUrl(l.url)).map((l) => `<a class="press-more" href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.texte || "En savoir plus")} ›</a>`).join("")}
         </div>
       </article>`;
-    }).join("");
-    $("#actus").hidden = false;
+  }
+  function pageNews() {
+    const list = ((D.actus && D.actus.actus) || []).filter((n) => n.titre)
+      .sort((x, y) => (y.date || "").localeCompare(x.date || ""));
+    return {
+      title: "Actualités du club",
+      html: `${back("#top", "Accueil")}
+        <div class="page-head"><p class="kicker">Actualités</p><h1>Actualités du club</h1>
+        <p class="muted">Les nouvelles de Borin'Old Cars : actions, résultats, remerciements.</p></div>
+        ${list.length ? `<div class="news">${list.map(newsItem).join("")}</div>` : '<p class="empty">Pas encore d\'actualité.</p>'}`,
+    };
   }
 
   function renderSponsors(data) {
@@ -574,7 +579,7 @@
   const ROUTES = [
     [/^sorties$/, pageEvents], [/^sortie-(.+)$/, pageEvent],
     [/^voitures$/, pageCars], [/^voiture-(.+)$/, pageCar],
-    [/^albums$/, pageAlbums], [/^album-(.+)$/, pageAlbum],
+    [/^actualites$/, pageNews], [/^albums$/, pageAlbums], [/^album-(.+)$/, pageAlbum],
     [/^adhesion$/, pageAdhesion], [/^inscription-(.+)$/, pageInscription], [/^commande$/, pageCommande], [/^roadbook-(.+)$/, pageRoadbook],
   ];
   const main = $("main"), page = $("#page");
@@ -626,13 +631,14 @@
   const roadbooks = fetch("roadbooks.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
   // Partenaires (sponsors.json de ce dépôt).
   fetch("presse.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({})).then(renderPress);
-  fetch("actus.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({})).then(renderNews);
   fetch("sponsors.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({})).then(renderSponsors);
   // Portraits du comité (portraits.json de ce dépôt : "slug-du-membre": "portraits/fichier.webp").
   const portraits = fetch("portraits.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
   const affiches = fetch("affiches/index.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
   const videos = fetch("videos/index.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
-  Promise.all(["config", "members", "events", "photos", "boutique"].map(load).concat(roadbooks, portraits, affiches, videos)).then((all) => {
+  const actus = fetch("actus.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+  Promise.all(["config", "members", "events", "photos", "boutique"].map(load).concat(roadbooks, portraits, affiches, videos, actus)).then((all) => {
+    D.actus = all.pop() || {};
     D.videos = all.pop() || {};
     D.affiches = all.pop() || {};
     D.portraits = all.pop() || {};
